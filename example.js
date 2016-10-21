@@ -12,7 +12,7 @@ var receiver = {
     }
 };
 
-var parser = new slip.parser( receiver );
+var parser = new slip.parser( receiver, true );
 
 parser.write( new Buffer( 'C000112233445566DBDCDBDDC0', 'hex' ) );
 
@@ -24,6 +24,14 @@ parser.write( new Buffer( 'C0FFEEDDC0C0DDEEFFC0', 'hex' ) );
 parser.write( new Buffer( 'C0FFEEDDC0AA55A55AC0DDEEFFC0', 'hex' ) );
 
 parser.write( new Buffer( 'C00011DBAA1100C0', 'hex' ) );
+
+parser.write( new Buffer( '778899AABBCCDDEEFF001122334455667788C0', 'hex' ) );
+parser.write( new Buffer( 'C000112233445566778899AABBCCDDEEFF001122334455667788C0', 'hex' ) );
+
+parser.write( new Buffer( 'C000112233445566778899AABBCCDDEEFF001122334455667788C0C0C0', 'hex' ) );
+parser.write( new Buffer( 'C000112233445566778899AABBCCDDEEFF001122334455667788C0C0C0C0', 'hex' ) );
+parser.write( new Buffer( 'C0C000112233445566778899AABBCCDDEEFF001122334455667788C0', 'hex' ) );
+
 
 var input = Buffer( '00FF00FFDBFFC0FF', 'hex' );
 console.log( "Here's your SLIPified packet: " + slip.generator( input ).toString( 'hex' ).toUpperCase() );

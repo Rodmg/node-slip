@@ -5,6 +5,8 @@
 	this.increment = ( increment ? increment : start );
 	this.buffer = new Buffer( this.start );
 	this.size = 0;
+	// For Special case support when we started receiving an incomplete package
+	this.prevWasCharEnd = false;
     }
 
     slip_buffer.prototype.append = function ( input ) {
@@ -43,6 +45,21 @@
 
     slip_parser.prototype.write = function ( input_buffer ) {
 	for( var i = 0, il = input_buffer.length; i < il; i++ ) {
+
+		// Special case, when we started receiving an incomplete package,
+		// check if next is another CHAR_END, in that case, only dump
+		// The first char end so we don't enter in an endless framming error
+		// train
+		if(this.prevWasCharEnd && input_buffer[ i ] === slip_parser.CHAR_END){
+			this.state = slip_parser.STATE_OUT;
+			this.prevWasCharEnd = true;
+			this.error.contentsAndReset( this.receiver, this.receiver.framing );
+		} else if(input_buffer[ i ] === slip_parser.CHAR_END) {
+			this.prevWasCharEnd = true;
+		} else {
+			this.prevWasCharEnd = false;
+		}
+
 	    switch( this.state ) {
 	    case slip_parser.STATE_OUT:
 		switch( input_buffer[ i ] ) {
